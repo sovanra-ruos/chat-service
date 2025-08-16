@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "name": "UserPresenceAvro",
+  "namespace": "com.chatengine.avro",
+  "fields": [
+    {"name": "userId", "type": "string"},
+    {"name": "username", "type": "string"},
+    {"name": "roomId", "type": "string"},
+    {"name": "status", "type": {"type": "enum", "name": "PresenceStatus", "symbols": ["ONLINE", "OFFLINE", "AWAY"]}},
+    {"name": "timestamp", "type": "long"}
+  ]
+}

@@ -1,0 +1,71 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.5'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.github.davidmc24.gradle.plugin.avro' version '1.9.1'
+}
+
+group = 'sr-tech.com'
+version = '0.0.1-SNAPSHOT'
+description = 'chat-service'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://packages.confluent.io/maven/' }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'io.confluent:kafka-avro-serializer:7.5.0'
+    implementation 'io.confluent:kafka-schema-registry-client:7.5.0'
+
+    implementation 'org.apache.avro:avro:1.11.4'
+
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'redis.clients:jedis'
+
+    // Database
+    implementation 'com.h2database:h2'
+
+    // JSON
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+
+}
+
+avro {
+    createSetters = true
+    stringType = 'String'
+    outputCharacterEncoding = 'UTF-8'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
