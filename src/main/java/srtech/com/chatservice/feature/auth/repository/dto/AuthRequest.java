@@ -1,0 +1,10 @@
+package srtech.com.chatservice.feature.auth.repository.dto;
+
+import lombok.Builder;
+
+@Builder
+public record AuthRequest(
+        String email,
+        String password
+) {
+}

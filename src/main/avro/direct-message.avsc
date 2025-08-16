@@ -1,0 +1,15 @@
+{
+  "type": "record",
+  "name": "DirectMessageAvro",
+  "namespace": "com.chatengine.avro",
+  "fields": [
+    {"name": "id", "type": "string"},
+    {"name": "senderId", "type": "string"},
+    {"name": "receiverId", "type": "string"},
+    {"name": "senderName", "type": "string"},
+    {"name": "content", "type": "string"},
+    {"name": "messageType", "type": {"type": "enum", "name": "DirectMessageType", "symbols": ["TEXT", "IMAGE", "FILE", "EMOJI"]}},
+    {"name": "timestamp", "type": "long"},
+    {"name": "conversationId", "type": "string"}
+  ]
+}

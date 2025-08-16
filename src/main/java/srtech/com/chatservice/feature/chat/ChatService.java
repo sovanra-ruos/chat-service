@@ -64,6 +64,14 @@ public class ChatService {
 
     public void saveMessage(MessageDto messageDto) {
         try {
+            // Skip saving JOIN and LEAVE messages to database - they are just notifications
+            if (messageDto.getMessageType() == ChatMessage.MessageType.JOIN ||
+                messageDto.getMessageType() == ChatMessage.MessageType.LEAVE) {
+                log.info("Skipping database save for notification message type: {} - ID: {}",
+                         messageDto.getMessageType(), messageDto.getId());
+                return;
+            }
+
             ChatMessage chatMessage = new ChatMessage();
 
             chatMessage.setId(messageDto.getId());

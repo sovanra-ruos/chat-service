@@ -3,40 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Engine</title>
+    <title>Secure Chat Application</title>
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 <div id="app">
-    <div id="username-page">
-        <div class="username-page-container">
-            <h1>Enter your username to start chatting</h1>
-            <form id="usernameForm" name="usernameForm">
-                <div class="form-group">
-                    <input type="text" id="name" placeholder="Username" autocomplete="off" class="form-control" />
-                </div>
-                <div class="form-group">
-                    <select id="roomSelect" class="form-control">
-                        <option value="">Select a room</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="accent username-submit">Start Chatting</button>
-                </div>
-            </form>
+    <!-- Authentication Section -->
+    <div id="auth-page">
+        <div class="auth-container">
+            <h1>Welcome to Secure Chat</h1>
+
+            <!-- Login Form -->
+            <div id="login-form" class="auth-form">
+                <h2>Login</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <input type="email" id="loginEmail" placeholder="Email" required class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="loginPassword" placeholder="Password" required class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="accent auth-submit">Login</button>
+                    </div>
+                    <p>Don't have an account? <a href="#" id="showRegister">Register here</a></p>
+                </form>
+            </div>
+
+            <!-- Registration Form -->
+            <div id="register-form" class="auth-form hidden">
+                <h2>Register</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <input type="text" id="registerUsername" placeholder="Username" required class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="registerEmail" placeholder="Email" required class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="registerPassword" placeholder="Password" required class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="confirmPassword" placeholder="Confirm Password" required class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="accent auth-submit">Register</button>
+                    </div>
+                    <p>Already have an account? <a href="#" id="showLogin">Login here</a></p>
+                </form>
+            </div>
         </div>
     </div>
 
+    <!-- Room Selection -->
+    <div id="room-page" class="hidden">
+        <div class="room-page-container">
+            <div class="user-info">
+                <h2>Welcome, <span id="currentUser"></span>!</h2>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
+            <h1>Select or Create a Chat Room</h1>
+
+            <!-- Existing Rooms -->
+            <div class="rooms-section">
+                <h3>Available Rooms</h3>
+                <div id="roomsList" class="rooms-list">
+                    <!-- Rooms will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Create New Room -->
+            <div class="create-room-section">
+                <h3>Create New Room</h3>
+                <form id="createRoomForm">
+                    <div class="form-group">
+                        <input type="text" id="roomName" placeholder="Room Name" required class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="roomDescription" placeholder="Room Description" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="accent">Create Room</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Room -->
     <div id="chat-page" class="hidden">
         <div class="chat-container">
             <div class="chat-header">
                 <h2>Chat Room: <span id="room-name"></span></h2>
-                <div class="online-users">
+                <div class="chat-controls">
                     <span>Online Users: <span id="online-count">0</span></span>
+                    <button id="leaveRoom" class="leave-room-btn">Leave Room</button>
                 </div>
             </div>
 
-            <div class="connecting">
+            <div class="connecting hidden">
                 Connecting...
             </div>
 
@@ -53,9 +118,15 @@
             </form>
         </div>
     </div>
+
+    <!-- Error Messages -->
+    <div id="errorMessage" class="error-message hidden">
+        <span id="errorText"></span>
+        <button id="closeError">&times;</button>
+    </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <script src="./chat.js"></script>
 </body>

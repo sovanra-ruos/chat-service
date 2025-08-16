@@ -14,7 +14,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, String
     @Query("SELECT m FROM ChatMessage m WHERE m.roomId = :roomId ORDER BY m.timestamp DESC")
     List<ChatMessage> findByRoomIdOrderByTimestampDesc(@Param("roomId") String roomId);
 
-    @Query(value = "SELECT * FROM chat_messages WHERE room_id = :roomId ORDER BY timestamp DESC LIMIT :limit", nativeQuery = true)
+    @Query(value = "SELECT * FROM chat_message WHERE room_id = :roomId ORDER BY timestamp DESC LIMIT :limit", nativeQuery = true)
     List<ChatMessage> findByRoomIdOrderByTimestampDesc(@Param("roomId") String roomId, @Param("limit") int limit);
 
     List<ChatMessage> findByRoomIdAndMessageTypeOrderByTimestampDesc(String roomId, ChatMessage.MessageType messageType);

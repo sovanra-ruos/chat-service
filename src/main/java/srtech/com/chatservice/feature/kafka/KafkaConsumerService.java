@@ -28,63 +28,6 @@ public class KafkaConsumerService {
     private final RedisService redisService;
 
     @KafkaListener(topics = "chat-messages", groupId = "chat-service-group")
-    public void consumeMessage(ChatMessageAvro chatMessageAvro) {
-        try {
-            log.info("Consumed message=[{}]", chatMessageAvro);
-
-            MessageDto messageDto = new MessageDto(
-                    chatMessageAvro.getId(),
-                    chatMessageAvro.getRoomId(),
-                    chatMessageAvro.getSenderId(),
-                    chatMessageAvro.getSenderName(),
-                    chatMessageAvro.getContent(),
-                    ChatMessage.MessageType.valueOf(chatMessageAvro.getMessageType().name()),
-                    chatMessageAvro.getTimestamp()
-            );
-
-            // save to db asynchronously
-            chatService.saveMessage(messageDto);
-
-            redisService.cacheRecentMessage(messageDto);
-
-            // Broadcast to WebSocket subscribers
-            messagingTemplate.convertAndSend(
-                    "/topic/room/" + messageDto.getRoomId(),
-                    messageDto
-            );
-
-        } catch (Exception e) {
-            log.error("Error consuming message: {}", e.getMessage(), e);
-        }
-    }
-
-    @KafkaListener(topics = "user-presence", groupId = "chat-service-group")
-    public void consumeUserPresence(UserPresenceAvro userPresenceAvro){
-        try {
-            log.info("Consumed user presence=[{}]", userPresenceAvro);
-
-            UserPresenceDto userPresenceDto = new UserPresenceDto(
-                    userPresenceAvro.getUserId(),
-                    userPresenceAvro.getUsername(),
-                    userPresenceAvro.getRoomId(),
-                    UserPresence.PresenceStatus.valueOf(userPresenceAvro.getStatus().name()),
-                    userPresenceAvro.getTimestamp()
-            );
-
-            redisService.updateUserPresence(userPresenceDto);
-
-            // Broadcast user presence status to WebSocket subscribers in room
-            messagingTemplate.convertAndSend(
-                    "/topic/room/" + userPresenceDto.getRoomId() + "/presence",
-                    userPresenceDto
-            );
-        }catch (Exception e){
-            log.error("Error consuming user presence message: {}", e.getMessage(), e);
-        }
-    }
-
-
-    @KafkaListener(topics = "chat-messages", groupId = "chat-service-group")
     public void consumeChatMessage(
             @Payload ChatMessageAvro chatMessage,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
@@ -102,11 +45,31 @@ public class KafkaConsumerService {
                     chatMessage.getMessageType(),
                     chatMessage.getTimestamp());
 
-            // Process the chat message here
-            // For example: broadcast to WebSocket clients, save to database, etc.
+            // Convert Avro message to DTO
+            MessageDto messageDto = new MessageDto(
+                    chatMessage.getId(),
+                    chatMessage.getRoomId(),
+                    chatMessage.getSenderId(),
+                    chatMessage.getSenderName(),
+                    chatMessage.getContent(),
+                    ChatMessage.MessageType.valueOf(chatMessage.getMessageType().name()),
+                    chatMessage.getTimestamp()
+            );
+
+            // Save to database asynchronously
+            chatService.saveMessage(messageDto);
+
+            // Cache in Redis
+            redisService.cacheRecentMessage(messageDto);
+
+            // **CRITICAL**: Broadcast to WebSocket subscribers
+            String destination = "/topic/room/" + messageDto.getRoomId();
+            log.info("Broadcasting message to WebSocket destination: {}", destination);
+            messagingTemplate.convertAndSend(destination, messageDto);
 
             // Acknowledge successful processing
             acknowledgment.acknowledge();
+            log.debug("Successfully processed and broadcasted chat message: {}", chatMessage.getId());
 
         } catch (Exception e) {
             log.error("Error processing chat message: {}", e.getMessage(), e);
@@ -131,11 +94,26 @@ public class KafkaConsumerService {
                     userPresence.getStatus(),
                     userPresence.getTimestamp());
 
-            // Process the user presence update here
-            // For example: update user status in Redis, broadcast to WebSocket clients, etc.
+            // Convert Avro message to DTO
+            UserPresenceDto userPresenceDto = new UserPresenceDto(
+                    userPresence.getUserId(),
+                    userPresence.getUsername(),
+                    userPresence.getRoomId(),
+                    UserPresence.PresenceStatus.valueOf(userPresence.getStatus().name()),
+                    userPresence.getTimestamp()
+            );
+
+            // Update Redis cache
+            redisService.updateUserPresence(userPresenceDto);
+
+            // Broadcast user presence to WebSocket subscribers
+            String destination = "/topic/room/" + userPresenceDto.getRoomId() + "/presence";
+            log.info("Broadcasting presence update to WebSocket destination: {}", destination);
+            messagingTemplate.convertAndSend(destination, userPresenceDto);
 
             // Acknowledge successful processing
             acknowledgment.acknowledge();
+            log.debug("Successfully processed and broadcasted user presence: {}", userPresence.getUserId());
 
         } catch (Exception e) {
             log.error("Error processing user presence: {}", e.getMessage(), e);

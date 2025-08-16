@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "name": "GroupMessageAvro",
+  "namespace": "com.chatengine.avro",
+  "fields": [
+    {"name": "id", "type": "string"},
+    {"name": "groupId", "type": "string"},
+    {"name": "senderId", "type": "string"},
+    {"name": "senderName", "type": "string"},
+    {"name": "content", "type": "string"},
+    {"name": "messageType", "type": {"type": "enum", "name": "GroupMessageType", "symbols": ["TEXT", "IMAGE", "FILE", "EMOJI", "JOIN", "LEAVE"]}},
+    {"name": "timestamp", "type": "long"}
+  ]
+}

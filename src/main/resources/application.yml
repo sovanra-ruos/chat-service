@@ -5,23 +5,20 @@ spring:
   application:
     name: chat-service
 
-  # H2 Database Configuration
+  # PostgreSQL Database Configuration
   datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: password
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    url: jdbc:postgresql://localhost:5432/chat
+    username: postgres
+    password: 12345
+    driver-class-name: org.postgresql.Driver
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate.jdbc.lob.non_contextual_creation: true
 
   # Redis Configuration
   data:
@@ -54,7 +51,20 @@ spring:
       properties:
         schema.registry.url: http://localhost:8081
 
+kafka:
+  topics:
+    direct-messages: direct-messages
+    group-messages: group-messages
+    user-presence: user-presence
+    notifications: notifications
+
+ACCESS_TOKEN_PRIVATE_KEY_PATH: access-refresh-token-keys/access-token-private.key
+ACCESS_TOKEN_PUBLIC_KEY_PATH: access-refresh-token-keys/access-token-public.key
+# This is for the refresh token
+REFRESH_TOKEN_PRIVATE_KEY_PATH: access-refresh-token-keys/refresh-token-private.key
+REFRESH_TOKEN_PUBLIC_KEY_PATH: access-refresh-token-keys/refresh-token-public.key
+
 logging:
   level:
-    org.springframework.kafka: DEBUG
-    srtech.com.chatservice: DEBUG
+    com.chatengine: DEBUG
+    org.springframework.kafka: INFO
